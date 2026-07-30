@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: scam-shield-mvp
+    runtime: docker
+    autoDeploy: true
+    healthCheckPath: /health
+    envVars:
+      - key: ALLOW_ORIGINS
+        sync: false
+      - key: API_RATE_LIMIT_PER_MIN
+        value: "60"
+      - key: DATABASE_URL
+        value: sqlite:///./scam_shield.db
