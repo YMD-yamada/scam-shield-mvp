@@ -2,6 +2,7 @@ services:
   - type: web
     name: scam-shield-mvp
     runtime: docker
+    plan: free
     autoDeploy: true
     healthCheckPath: /health
     envVars:
@@ -9,5 +10,8 @@ services:
         sync: false
       - key: API_RATE_LIMIT_PER_MIN
         value: "60"
+      # Free instances have an ephemeral filesystem: this SQLite file is wiped
+      # on every deploy and on every wake from sleep. Reports are not durable
+      # until the service moves to a paid plan with a persistent disk.
       - key: DATABASE_URL
         value: sqlite:///./scam_shield.db
