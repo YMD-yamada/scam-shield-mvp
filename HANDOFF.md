@@ -1,6 +1,6 @@
-# CURSOR_HANDOFF — scam-shield-mvp
+# HANDOFF — scam-shield-mvp
 
-更新: 2026-07-30
+更新: 2026-09-21
 
 ## 正本
 
