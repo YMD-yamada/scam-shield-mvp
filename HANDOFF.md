@@ -42,7 +42,7 @@ uvicorn app.main:app --reload
 
 ### 2026-09-21 Claude Code（2）Render 設定修正
 
-- PR #2 `fix/render-free-deploy-config`（CI pass、マージ待ち）
+- PR #2 マージ済み（`c1f09a7`）/ PR #3 マージ済み（`cdd548a`）
 - `render.yaml`: `plan: free` を明記。**未指定だと Render は `0.5c-512mb`（有料）を割り当てる**ため、
   そのままデプロイすると課金されるところだった。
 - `Dockerfile`: ポート直書き 8000 → `${PORT:-8000}`。Render は `PORT`（既定 10000）を注入する。
@@ -52,6 +52,10 @@ uvicorn app.main:app --reload
 - `docs/DEPLOYMENT.md`: 現状に合わせて更新。**Free はファイルシステムが揮発性で通報データが永続しない**
   ことを明記（永続化には有料プラン + ディスク、または外部 Postgres が必要）。
 - 前回「未対応」の CORS `allow_credentials=True` は、`ALLOW_ORIGINS` に `*` を入れない運用で回避する方針。
+- PR #3: CI に `docker` ジョブを追加。開発機に Docker が無くイメージを検証できなかったため、
+  CI 上で build → `PORT=10000` で起動 → `/health` 確認 → `X-Forwarded-For` がクライアント IP として
+  記録されることを検証する。将来 `--proxy-headers` が外れたら CI が落ちる。
+  実行結果: image build OK、`{"ok":true,...}` 応答 OK、forwarded IP 検出 OK。
 
 ### 2026-09-21 Claude Code（1）テスト追加
 
