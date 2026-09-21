@@ -24,3 +24,29 @@ jobs:
         run: python -m pytest -q
       - name: Smoke
         run: python scripts/smoke_test.py
+
+  docker:
+    name: docker image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t scam-shield:ci .
+      - name: Boot on an injected PORT like Render does
+        run: |
+          docker run -d --name scam-shield-ci -e PORT=10000 -p 10000:10000 scam-shield:ci
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:10000/health > /dev/null; then break; fi
+            sleep 2
+          done
+          curl -fsS http://127.0.0.1:10000/health
+      - name: Check the forwarded client IP reaches the app
+        run: |
+          curl -fsS -H 'X-Forwarded-For: 203.0.113.9' http://127.0.0.1:10000/health > /dev/null
+          if ! docker logs scam-shield-ci 2>&1 | grep -q '203.0.113.9'; then
+            echo 'proxy headers are not in effect; the rate limiter would see the proxy IP'
+            exit 1
+          fi
+      - name: Stop container
+        if: always()
+        run: docker rm -f scam-shield-ci || true
